@@ -4,4 +4,4 @@ from django.http import HttpResponse
 def index(request):
 
 # Render the HTML template index.html with the data in the context variable.
-   return HttpResponse('home page')
+   return render(request,'task_tracker/base_template.html')
