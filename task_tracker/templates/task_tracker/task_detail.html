@@ -1,0 +1,26 @@
+{% extends 'task_tracker/base_template.html' %}
+{% block content %}
+  <ul class="list-group mx-4 w-auto " style="list-style-type: none;">
+    <li class="list-group-item border-0 ">
+      <h2 class="">{{ task.summary }}</h2>
+    </li>
+    <li class="list-group-item border-0 ">
+      <h4>Created: {{ task.date_created|date:"M. j,Y" }}</h4>
+    </li>
+    <li class="list-group-item border-0 ">
+      <h4>Due: {{ task.deadline }}</h4>
+    </li>
+    <li class="list-group-item border-0 ">
+      {% if task.priority == 1%}
+        <h4>Priority: <span class="text-danger ">High</span></h4>
+      {% elif task.priority == 2 %}
+        <h4>Priority: <span class="text-warning">Medium</span></h4>
+      {% else %}
+        <h4>Priority: <span class="text-primary">Low</span></h4>
+      {% endif %}
+    </li>
+    <li class="list-group-item border-2  border-black">
+      <p class="border-black ">{{ task.detail }}</p>
+    </li>
+  </ul>
+{% endblock %}

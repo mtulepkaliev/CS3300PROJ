@@ -9,4 +9,5 @@ urlpatterns = [
 # example in html <a href="{% url 'index' %}">Home</a>.
 path('', views.index, name='index'),
 path('task_list/', views.taskListView.as_view(), name='task-list-view'),
+path('task/<int:pk>/', views.taskDetailView.as_view(), name='task-detail-view'),
 ]

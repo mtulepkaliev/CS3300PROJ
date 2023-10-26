@@ -15,6 +15,9 @@ class taskListView(generic.ListView):
 
     #puts all the completed tasks at the bottom and orders the rest by deadline
     def get_queryset(self):
-        return Task.objects.all().order_by('is_complete','-date_created')
+        return Task.objects.all().order_by('is_complete','deadline','priority')
+
+class taskDetailView(generic.DetailView):
+    model = Task
 
 

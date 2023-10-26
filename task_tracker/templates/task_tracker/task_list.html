@@ -1,4 +1,5 @@
-{% extends 'task_tracker/base_template.html' %}'{% block content %}
+{% extends 'task_tracker/base_template.html' %}
+{% block content %}
 
   <h2 class="ms-4">Tasks</h2>
   {% if task_list %}
@@ -26,7 +27,7 @@
               {% endif %}
             </td>
             <td>
-              <h4>{{ task.summary }}</h4>
+              <h4><a class="link-secondary" href="{%url 'task-detail-view' task.id %}">{{ task.summary }}</a></h4>
             </td>
             <td>
               <h5>{{ task.deadline|date:"m/d/y"}}</h5>
