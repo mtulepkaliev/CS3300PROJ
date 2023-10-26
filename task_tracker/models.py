@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 class Task(models.Model):
@@ -17,3 +18,11 @@ class Task(models.Model):
 
     def __str__(self):
         return self.summary
+    
+    # https://stackoverflow.com/questions/59698423/when-should-you-use-property-in-a-model-class
+    @property
+    def isOverdue(self):
+        if(self.deadline and self.deadline < timezone.now()):
+            return True
+        else:
+            return False
