@@ -1,7 +1,13 @@
 {% extends 'task_tracker/base_template.html' %}
 {% block content %}
 
-  <h2 class="ms-4">Tasks</h2>
+  <div class="container-fluid ">
+    <div class="mx-4 mt-3">
+      <h2 class="float-start ">Tasks</h2>
+      <a class="btn btn-primary float-end" href="{% url 'task-create-view' %}">Create Task</a>
+    </div>
+  </div>
+  
   {% if task_list %}
   <div class="container-fluid px-4">
     <table class="table table-striped">

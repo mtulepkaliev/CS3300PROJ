@@ -10,4 +10,5 @@ urlpatterns = [
 path('', views.index, name='index'),
 path('task_list/', views.taskListView.as_view(), name='task-list-view'),
 path('task/<int:pk>/', views.taskDetailView.as_view(), name='task-detail-view'),
+path('task/create/', views.taskCreateView, name='task-create-view'),
 ]

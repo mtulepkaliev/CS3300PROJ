@@ -4,6 +4,8 @@ from django.http import HttpResponse
 from django.views import generic
 from .models import *
 from django.utils import timezone
+from.forms import TaskForm  
+
 # Create your views here.
 def index(request):
 
@@ -19,5 +21,15 @@ class taskListView(generic.ListView):
 
 class taskDetailView(generic.DetailView):
     model = Task
+
+def taskCreateView(request,**kwargs):
+    if request.method == 'POST':
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('task-list-view')
+    else:
+        form = TaskForm()
+    return render(request,'task_tracker/create_task_form.html',{'form':form})
 
 
