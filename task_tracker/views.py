@@ -30,6 +30,30 @@ def taskCreateView(request,**kwargs):
             return redirect('task-list-view')
     else:
         form = TaskForm()
-    return render(request,'task_tracker/create_task_form.html',{'form':form})
+    return render(request,'task_tracker/task_form.html',{'form':form})
 
+def taskUpdateView(request,**kwargs):
+    task = Task.objects.get(id=kwargs['pk'])
+    if request.method == 'POST':
+        form = TaskForm(request.POST,instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect('task-detail-view',pk=kwargs['pk'])
+    else:
+        form = TaskForm(instance=task)
+    return render(request,'task_tracker/task_form.html',{'form':form})
+
+def taskDeleteView(request,**kwargs):
+    task = Task.objects.get(id=kwargs['pk'])
+    if request.method == 'POST':
+        task.delete()
+        return redirect('task-list-view')
+    else:
+        return render(request,'task_tracker/task_confirm_delete.html',{'task':task})
+    
+def taskToggleCompleteView(request,**kwargs):
+    task = Task.objects.get(id=kwargs['pk'])
+    task.is_complete = not task.is_complete
+    task.save()
+    return redirect(request.META['HTTP_REFERER'])
 

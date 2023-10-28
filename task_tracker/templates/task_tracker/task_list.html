@@ -23,12 +23,12 @@
           <tr>
             <td>
               {% if task.is_complete %}
-                <a href="#" class="btn btn-success">Complete</a>
+                <a href="{% url 'task-toggle-complete-view' task.id%}" class="btn btn-success">Complete</a>
               {% else %}
                 {% if task.isOverdue %}
-                  <a href="#" class="btn btn-danger">Overdue</a>
+                  <a href="{% url 'task-toggle-complete-view' task.id%}" class="btn btn-danger">Overdue</a>
                 {% else %}
-                  <a href="#" class="btn btn-warning">Incomplete</a>
+                  <a href="{% url 'task-toggle-complete-view' task.id%}" class="btn btn-warning">Incomplete</a>
                 {% endif %}
               {% endif %}
             </td>
