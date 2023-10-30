@@ -14,6 +14,7 @@ class TaskForm(ModelForm):
             'deadline': forms.DateInput(attrs={'type': 'date'}),
         }
 
+        #custom labels for the form
         labels = {
             'summary': 'Summary',
             'detail': 'Detail',

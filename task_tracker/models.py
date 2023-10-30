@@ -6,7 +6,7 @@ class Task(models.Model):
 
     #TODO remove this as we will be implementing department model later
     department_choices = [("All","ALL"),("EE","Electrical"), ("MECH","Mechanical"),("BUS","Business")]
-
+    
     priority_choices = [(3,"LOW"),(2,"MEDIUM"),(1,"HIGH")]
 
     summary = models.CharField(max_length=200)

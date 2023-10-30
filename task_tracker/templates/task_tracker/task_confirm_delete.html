@@ -3,6 +3,8 @@
 {% block content %}
 <div class="pt-3 px-3">
 <h5 class="pb-3"> Are you sure you want to delete "{{ task.summary }}"?</h5>
+
+<!-- Shows warning for cascading delete-->
 {% if task.childTasks %}
 <p><span class="font-weight-bold text-warning">Warning:</span> Deleting this task will delete the following child tasks:</p>
 <ul>
@@ -11,6 +13,8 @@
     {% endfor %}
 </ul>
 {% endif %}
+
+<!-- form code -->
 <form action = "" method="POST">
     <button class="btn btn-primary" onclick="window.location.href='{{project.portfolio.get_absolute_url}}'">Cancel</button>
         {% csrf_token %}

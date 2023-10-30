@@ -50,10 +50,11 @@ def taskDeleteView(request,**kwargs):
         return redirect('task-list-view')
     else:
         return render(request,'task_tracker/task_confirm_delete.html',{'task':task})
-    
+
 def taskToggleCompleteView(request,**kwargs):
     task = Task.objects.get(id=kwargs['pk'])
     task.is_complete = not task.is_complete
     task.save()
+    #redirect to the page that made the request, makes the change seamless
     return redirect(request.META['HTTP_REFERER'])
 
