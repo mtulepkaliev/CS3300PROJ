@@ -18,7 +18,7 @@
         <h4>Created: {{ task.date_created|date:'M. j,Y' }}</h4>
       </li>
       <li class="list-group-item border-0">
-        <h4>Due: {{ task.deadline }}</h4>
+        <h4>Due: {{ task.deadline|date:'M. j,Y' }}</h4>
       </li>
       <li class="list-group-item border-0">
         {% if task.is_complete %}
