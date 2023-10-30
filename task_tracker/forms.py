@@ -8,7 +8,7 @@ from django.contrib.admin.widgets import AdminDateWidget
 class TaskForm(ModelForm):
     class Meta:
         model = Task
-        fields = ['summary','detail','deadline','priority','department','parentTask']
+        fields = ['summary','detail','deadline','priority','department','parent_task']
         #override dealdine to use a date picker
         widgets = {
             'deadline': forms.DateInput(attrs={'type': 'date'}),
@@ -21,5 +21,5 @@ class TaskForm(ModelForm):
             'deadline': 'Deadline (Optional)',
             'priority': 'Priority',
             'department': 'Department',
-            'parentTask': 'Parent Task (Optional)',
+            'parent_task': 'Parent Task (Optional)',
         }

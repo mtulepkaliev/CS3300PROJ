@@ -15,7 +15,7 @@ class Task(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField(null=True, blank=True)
     priority = models.IntegerField(choices=priority_choices,default=3,null=False,blank=False)
-    parentTask = models.ForeignKey('self',related_name="children",on_delete=models.CASCADE,blank=True,null=True)
+    parent_task = models.ForeignKey('self',related_name="children",on_delete=models.CASCADE,blank=True,null=True)
 
     #TODO change to FK
     department = models.CharField(max_length=200,choices=department_choices,default="All",blank=False)
@@ -25,7 +25,7 @@ class Task(models.Model):
     
     # https://stackoverflow.com/questions/59698423/when-should-you-use-property-in-a-model-class
     @property
-    def isOverdue(self):
+    def is_overdue(self):
         if(self.deadline and self.deadline < timezone.now()):
             return True
         else:
@@ -34,12 +34,12 @@ class Task(models.Model):
     # Recursively collect children, used to figure out what would get removed with cascade delete  
     # https://stackoverflow.com/questions/35281293/recursively-collect-children-in-python-django
     @property
-    def childTasks(self):
+    def child_tasks(self):
         childTasks = self.children.all()
         if not childTasks:
             return None
         else:
             for task in childTasks:
-                if task.childTasks:
-                    childTasks = childTasks | task.childTasks
+                if task.child_tasks:
+                    childTasks = childTasks | task.child_tasks
             return childTasks
