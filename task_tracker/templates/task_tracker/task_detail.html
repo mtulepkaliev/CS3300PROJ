@@ -27,6 +27,9 @@
         <h4>Due: {{ task.deadline|date:'M. j,Y' }}</h4>
       </li>
 
+      <li class="list-group-item border-0">
+        <h4>Department: {{ task.get_department_display }}</h4>
+      </li>
       <!-- completion status-->
       <li class="list-group-item border-0">
         {% if task.is_complete %}
@@ -47,7 +50,12 @@
           <h4>Priority: <span class="text-primary">Low</span></h4>
         {% endif %}
       </li>
-      <li class="list-group-item border-0"></li>
+      <li class="list-group-item border-0">
+        <!-- Parent task-->
+        {% if task.parent_task%}
+          <h4>Parent Task: <a href="{%url 'task-detail-view' task.parent_task.id %}">{{task.parent_task}}</a></h4>
+        {% endif %}
+      </li>
       <li class="mt-4 list-group-item border-2 border-black">
         <p class="border-black">{{ task.detail }}</p>
       </li>

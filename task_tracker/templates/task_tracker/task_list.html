@@ -32,7 +32,7 @@
               {% if task.is_complete %}
                 <a href="{% url 'task-toggle-complete-view' task.id%}" class="btn btn-success">Complete</a>
               {% else %}
-                {% if task.isOverdue %}
+                {% if task.is_overdue %}
                   <a href="{% url 'task-toggle-complete-view' task.id%}" class="btn btn-danger">Overdue</a>
                 {% else %}
                   <a href="{% url 'task-toggle-complete-view' task.id%}" class="btn btn-warning">Incomplete</a>
