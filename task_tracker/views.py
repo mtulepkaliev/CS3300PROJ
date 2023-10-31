@@ -8,9 +8,8 @@ from.forms import TaskForm
 
 # Create your views here.
 def index(request):
-
 # Render the HTML template index.html with the data in the context variable.
-   return redirect('task-list-view')
+   return render(request, 'task_tracker/index.html')
 
 class taskListView(generic.ListView):
     model = Task
