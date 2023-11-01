@@ -1,0 +1,37 @@
+{% extends 'task_tracker/base_template.html' %}
+
+{% block content %}
+  <div class="container-fluid px-2 pt-2">
+    <h1>HARE FSAE Task Tracker</h1>
+    <p>
+      Go the the task tab <a href="{% url 'task-list-view' %}">here</a> to view, add edit and remove tasks
+    </p>
+    <p>Each task looks like this</p>
+    <table class="table table-striped">
+      <!-- table headings -->
+      <tbody>
+        <tr>
+          <td>
+            <!-- button based on completion/due status -->
+            <a href="#" class="btn btn-warning">Incomplete</a>
+          </td>
+          <td>
+            <h4><a class="link-secondary" href="#">Task Summary</a></h4>
+          </td>
+          <td>
+            <h5>Due Date</h5>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      Click on the task summary to view the task details
+    </p>
+    <p>
+      Click on the button to change the completion status of the task
+    </p>
+    <p>
+      Click the create task button to add a new Task
+    </p>
+  </div>
+{% endblock %}

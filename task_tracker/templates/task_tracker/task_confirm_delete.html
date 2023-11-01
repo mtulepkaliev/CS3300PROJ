@@ -1,0 +1,24 @@
+{% extends 'task_tracker/base_template.html' %}
+
+{% block content %}
+<div class="pt-3 px-3">
+<h5 class="pb-3"> Are you sure you want to delete "{{ task.summary }}"?</h5>
+
+<!-- Shows warning for cascading delete-->
+{% if task.child_tasks %}
+<p><span class="font-weight-bold text-warning">Warning:</span> Deleting this task will delete the following child tasks:</p>
+<ul>
+    {% for childTask in task.child_tasks %}
+    <li>{{ childTask.summary }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<!-- form code -->
+<button class="btn btn-primary float-start" onclick="window.location.href='{% url 'task-detail-view' task.id%}'">Cancel</button>
+<form action = "" method="POST">
+        {% csrf_token %}
+        <input class="btn btn-danger float-start" type="submit" name="Delete">
+    </form>
+</div>
+{% endblock %}
