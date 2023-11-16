@@ -4,8 +4,6 @@ from django.utils import timezone
 # Create your models here.
 class Task(models.Model):
 
-    #TODO remove this as we will be implementing department model later
-    department_choices = [("All","ALL"),("EE","Electrical"), ("MECH","Mechanical"),("BUS","Business")]
     
     priority_choices = [(3,"LOW"),(2,"MEDIUM"),(1,"HIGH")]
 
@@ -17,8 +15,8 @@ class Task(models.Model):
     priority = models.IntegerField(choices=priority_choices,default=3,null=False,blank=False)
     parent_task = models.ForeignKey('self',related_name="children",on_delete=models.CASCADE,blank=True,null=True)
 
-    #TODO change to FK
-    department = models.CharField(max_length=200,choices=department_choices,default="All",blank=False)
+    #M:N relationship with Department
+    department = models.ManyToManyField('Department',related_name="tasks",blank=True)
 
     def __str__(self):
         return self.summary
@@ -43,3 +41,9 @@ class Task(models.Model):
                 if task.child_tasks:
                     childTasks = childTasks | task.child_tasks
             return childTasks
+        
+class Department(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(max_length=1000)
+    def __str__(self):
+        return self.name

@@ -13,10 +13,16 @@ def index(request):
 
 class taskListView(generic.ListView):
     model = Task
+    template_name = 'task_tracker/task_list.html'
 
     #puts all the completed tasks at the bottom and orders the rest by deadline
     def get_queryset(self):
-        return Task.objects.all().order_by('is_complete','deadline','priority')
+
+        #print out only that department's tasks if department_id is in the url
+        if('department_id' not in self.kwargs):
+            return Task.objects.all().order_by('is_complete','deadline','priority')
+        else:
+            return Task.objects.filter(department=self.kwargs['department_id']).order_by('is_complete','deadline','priority')
 
 class taskDetailView(generic.DetailView):
     model = Task
