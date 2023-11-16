@@ -37,6 +37,9 @@ class taskDetailView(generic.DetailView):
 class departmentDetailView(generic.DetailView):
     model = Department
 
+class studentDetailView(generic.DetailView):
+    model = Student
+
 @login_required(login_url='login')
 def taskCreateView(request,**kwargs):
     if request.method == 'POST':

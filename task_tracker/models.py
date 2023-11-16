@@ -74,3 +74,9 @@ class Department(models.Model):
 #each student maps to a django user
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE,null=False,blank=False)
+
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'

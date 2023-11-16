@@ -19,6 +19,7 @@ path('task/<int:pk>/toggle_complete/', views.taskToggleCompleteView, name='task-
 path('departments/<int:pk>/',views.departmentDetailView.as_view(),name='department-detail-view'),
 path('students/register',views.registerPage,name='student-register-page'),
 path('departments/create/',views.departmentCreateView,name='department-create-view'),
+path('students/<int:pk>/',views.studentDetailView.as_view(),name='student-detail-view'),
 ]
 
 urlpatterns += [
