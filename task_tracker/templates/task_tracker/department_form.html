@@ -1,0 +1,18 @@
+<!-- inherit from base.html -->
+{% extends 'task_tracker/base_template.html' %}
+
+<!-- Replace block content in base_template.html -->
+{% block content %}
+
+{% load crispy_forms_tags %}
+<div class='mx-5 col-6 mt-4 '>
+<h2 class='text-center'>Create New Department</h2>
+<form action="" method="POST">
+
+{% csrf_token %}
+{{ form|crispy }}
+<input class="btn btn-primary" type="submit" name="Submit">
+</form>
+</div>
+
+{% endblock %}

@@ -77,6 +77,17 @@ def taskToggleCompleteView(request,**kwargs):
     #redirect to the page that made the request, makes the change seamless
     return redirect(request.META['HTTP_REFERER'])
 
+@login_required(login_url='login')
+def departmentCreateView(request,**kwargs):
+    if request.method == 'POST':
+        form = CreateDepartmentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('task-list-view')
+    else:
+        form = CreateDepartmentForm()
+    return render(request,'task_tracker/department_form.html',{'form':form})
+
 def registerPage(request):
 
     form = CreateStudentForm()

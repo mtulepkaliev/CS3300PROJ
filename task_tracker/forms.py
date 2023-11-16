@@ -38,3 +38,8 @@ class CreateStudentForm(ModelForm):
     class Meta:
         model = Student
         fields = []
+
+class CreateDepartmentForm(ModelForm):
+    class Meta:
+        model = Department
+        fields = ['name','description']

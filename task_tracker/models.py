@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,Group
 
 # Create your models here.
 class Task(models.Model):
@@ -52,8 +52,23 @@ class Department(models.Model):
     
     #on creation, create a group for the department members and leaders
     def save(self,*args,**kwargs):
-        
-        super.save(self,*args,**kwargs)
+        groupName = self.name + "Members"
+        leaderGroupName = self.name + "Leaders"
+        #create the groups
+        group = Group.objects.create(name=groupName)
+        leaderGroup = Group.objects.create(name=leaderGroupName)
+        super().save(self,*args,**kwargs)
+    
+    #on deletion delete the associated groups
+    def delete(self,*args,**kwargs):
+        groupName = self.name + "Members"
+        leaderGroupName = self.name + "Leaders"
+        #delete the groups
+        group = Group.objects.get(name=groupName)
+        leaderGroup = Group.objects.get(name=leaderGroupName)
+        group.delete()
+        leaderGroup.delete()
+        super().delete(self,*args,**kwargs)
     
 
 #each student maps to a django user
