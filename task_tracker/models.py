@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Task(models.Model):
@@ -41,9 +42,20 @@ class Task(models.Model):
                 if task.child_tasks:
                     childTasks = childTasks | task.child_tasks
             return childTasks
-        
+
+#department model
 class Department(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(max_length=1000)
     def __str__(self):
         return self.name
+    
+    #on creation, create a group for the department members and leaders
+    def save(self,*args,**kwargs):
+        
+        super.save(self,*args,**kwargs)
+    
+
+#each student maps to a django user
+class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE,null=False,blank=False)

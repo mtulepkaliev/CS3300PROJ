@@ -1,0 +1,13 @@
+{% extends 'task_tracker/base_template.html' %}
+
+{% block content %}
+  {% load crispy_forms_tags %}
+  <div class='mx-5 col-6 mt-4'>
+  <h2>HARE FSAE Member Registration</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <input class="btn btn-primary "type="submit" name="Create User" />
+    </form>
+  </div>
+{% endblock %}

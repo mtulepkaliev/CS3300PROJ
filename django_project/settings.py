@@ -28,17 +28,18 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['128.198.209.193','127.0.0.1','192.168.0.15']
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'task_tracker',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'task_tracker',
     'bootstrap5',
     'crispy_forms',
     "crispy_bootstrap5",
