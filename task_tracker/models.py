@@ -16,7 +16,7 @@ class Task(models.Model):
     parent_task = models.ForeignKey('self',related_name="children",on_delete=models.CASCADE,blank=True,null=True)
 
     #M:N relationship with Department
-    department = models.ManyToManyField('Department',related_name="tasks",blank=True)
+    departments = models.ManyToManyField('Department',related_name="tasks",blank=True)
 
     def __str__(self):
         return self.summary

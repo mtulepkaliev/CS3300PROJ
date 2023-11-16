@@ -22,10 +22,14 @@ class taskListView(generic.ListView):
         if('department_id' not in self.kwargs):
             return Task.objects.all().order_by('is_complete','deadline','priority')
         else:
-            return Task.objects.filter(department=self.kwargs['department_id']).order_by('is_complete','deadline','priority')
+            return Task.objects.filter(departments=self.kwargs['department_id']).order_by('is_complete','deadline','priority')
 
 class taskDetailView(generic.DetailView):
     model = Task
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        print(context['object'].departments.all)
+        return super().get_context_data(**kwargs)
 
 def taskCreateView(request,**kwargs):
     if request.method == 'POST':

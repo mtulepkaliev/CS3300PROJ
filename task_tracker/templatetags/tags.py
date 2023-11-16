@@ -7,7 +7,4 @@ register = template.Library()
 
 @register.simple_tag
 def department_name_id_dict(request):
-    mydict = Department.objects.all().values('name','id')
-    print(mydict)
-    print(mydict[0]['id'])
-    return mydict
+    return Department.objects.all().values('name','id')
