@@ -15,4 +15,5 @@ path('task/create/', views.taskCreateView, name='task-create-view'),
 path('task/<int:pk>/update/', views.taskUpdateView, name='task-update-view'),
 path('task/<int:pk>/delete/', views.taskDeleteView, name='task-delete-view'),
 path('task/<int:pk>/toggle_complete/', views.taskToggleCompleteView, name='task-toggle-complete-view'),
+path('department/<int:pk>/',views.departmentDetailView.as_view(),name='department-detail-view'),
 ]

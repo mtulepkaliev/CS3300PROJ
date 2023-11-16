@@ -31,6 +31,9 @@ class taskDetailView(generic.DetailView):
         print(context['object'].departments.all)
         return super().get_context_data(**kwargs)
 
+class departmentDetailView(generic.DetailView):
+    model = Department
+    
 def taskCreateView(request,**kwargs):
     if request.method == 'POST':
         form = TaskForm(request.POST)

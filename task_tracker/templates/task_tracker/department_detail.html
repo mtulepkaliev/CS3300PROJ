@@ -1,0 +1,16 @@
+{% extends 'task_tracker/base_template.html' %}
+{% block content %}
+  <div class="container-fluid float-start">
+    <ul class="list-group px-4 w-auto" style="list-style-type: none;">
+      <li class="list-group-item border-0">
+        <div class="mt-2 me-5">
+          <h2 class="float-start">{{ department.name }} Department</h2>
+        </div>
+      </li>
+
+      <li class="mt-4 list-group-item border-2 border-black">
+        <p class="border-black">{{ department.description }}</p>
+      </li>
+    </ul>
+  </div>
+{% endblock %}
