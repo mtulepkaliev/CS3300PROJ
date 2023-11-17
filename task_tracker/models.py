@@ -137,6 +137,21 @@ class Department(models.Model):
         self.leaderGroup.delete()
         super().delete(self,*args,**kwargs)
     
+    @property
+    def member_list(self):
+        studentSet = Student.objects.all()
+        for student in studentSet:
+            if(self.memberGroup not in student.user.groups.all()):
+                studentSet = studentSet.exclude(id=student.id)
+        return studentSet
+
+    @property
+    def leader_list(self):
+        studentSet = Student.objects.all()
+        for student in studentSet:
+            if(self.leaderGroup not in student.user.groups.all()):
+                studentSet = studentSet.exclude(id=student.id)
+        return studentSet
 
 #each student maps to a django user
 class Student(models.Model):

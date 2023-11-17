@@ -13,8 +13,8 @@ class departmentDetailView(generic.DetailView):
     model = Department
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context['leader_list'] = getLeaderList(context['object'])
-        context['member_list'] = getMemberList(context['object'])
+        context['leader_list'] = context['object'].leader_list
+        context['member_list'] = context['object'].member_list
         if(self.request.user.has_perm('task_tracker.manage_department',context['object'])):
             context['can_edit'] = True
         return context
@@ -29,6 +29,7 @@ class departmentListView(generic.ListView):
         context['wtf_department_solution_list'] = Department.objects.all()
         if(self.request.user.groups.filter(name='admin').exists()):
             context['is_admin'] = True
+        print(context)
         return context
     
 @login_required(login_url='login')
@@ -71,17 +72,3 @@ def departmentDeleteView(request,**kwargs):
             return render(request,'task_tracker/department_confirm_delete.html',{'department':department})
     else:
         return HttpResponse("You do not have permission to delete this department")
-
-def getMemberList(department):
-    studentSet = Student.objects.all()
-    for student in studentSet:
-        if(department.memberGroup not in student.user.groups.all()):
-            studentSet = studentSet.exclude(id=student.id)
-    return studentSet
-
-def getLeaderList(department):
-    studentSet = Student.objects.all()
-    for student in studentSet:
-        if(department.leaderGroup not in student.user.groups.all()):
-            studentSet = studentSet.exclude(id=student.id)
-    return studentSet

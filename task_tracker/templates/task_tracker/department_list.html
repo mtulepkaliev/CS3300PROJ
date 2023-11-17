@@ -18,9 +18,9 @@
       <!-- table headings-->
       <thead>
         <tr>
-          <th scope="col"><h3>Name</h3></th>
-          <th class="w-75" scope="col"><h3>Description</h3></th>
-          <th scope="col"><h3>Leader(s)</h3></th>
+          <th class="w-33" scope="col"><h3>Name</h3></th>
+          <th class="w-33" scope="col"><h3>Description</h3></th>
+          <th class="w-33" scope="col"><h3>Leader(s)</h3></th>
         </tr>
       </thead>
       <tbody>
@@ -34,7 +34,11 @@
               <p>{{ department.description }}</p>
             </td>
             <td>
-              <h5></h5>
+              <ul>
+                {% for leader in department.leader_list %}
+                  <li>{{ leader }}</li>
+                {% endfor %}
+              </ul>
             </td>
           </tr>
         {% endfor %}
