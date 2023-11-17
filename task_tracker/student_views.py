@@ -13,8 +13,8 @@ class studentDetailView(generic.DetailView):
     model = Student
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context['department_list'] = getStudentMembership(context['object'])
-        print(context['department_list'])
+        context['student_department_list'] = getStudentMembership(context['object'])
+        print(context['student_department_list'])
         return context
 
 #view for the register page
@@ -101,7 +101,7 @@ def getStudentMembership(student:Student):
     departmentQuerySet = Department.objects.all()
     for department in departmentQuerySet:
         #remove depts that the student is not a member of
-        if(student.user not in department.memberGroup.user_set.all()):
+        if(student.user not in department.memberGroup.user_set.all() and student.user not in department.leaderGroup.user_set.all()):
             departmentQuerySet = departmentQuerySet.exclude(id=department.id)
     return departmentQuerySet
             
