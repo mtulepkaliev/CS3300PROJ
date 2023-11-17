@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User,Group
+from guardian.shortcuts import assign_perm,get_perms,remove_perm
 
 # Create your models here.
 class Task(models.Model):
@@ -22,6 +23,32 @@ class Task(models.Model):
     #M;N relationship with Student
     assignedStudents = models.ManyToManyField('Student',related_name="assignedTasks",blank=True)
 
+    class Meta:
+        permissions = (
+            ('manage_task','Manage task'),
+        )
+
+    def save(self, *args, **kwargs):
+        #if the task is being created, not updated
+        if(not self.pk):
+            #give the admin group permission to manage the task
+            adminGroup = Group.objects.get(name='admin')
+            assign_perm('manage_task',adminGroup,self)
+        
+        self.updatePermissions(self.departments.all(),self.assignedStudents.all())
+
+        #propogate department permissions to children
+        if self.child_tasks:
+            for child in self.child_tasks:
+                
+                #if the child is not in the same departments as the parent, add the parent's departments to the child
+                for department in self.departments.all():
+                    if not department in child.departments.all():
+                        child.departments.add(department)
+                
+                #add the department permissions to the child
+                child.updatePermissions(self.departments.all(),child.assignedStudents.all())
+        return super().save(*args, **kwargs)
     def __str__(self):
         return self.summary
     
@@ -45,6 +72,25 @@ class Task(models.Model):
                 if task.child_tasks:
                     childTasks = childTasks | task.child_tasks
             return childTasks
+    
+    #updates the task's permissions based on the departments and students it is assigned to
+    def updatePermissions(self,departmentSet,studentSet):
+        #make sure only the given department leaders have task access
+        for department in Department.objects.all():
+            #if the department is in the given set, give the department leaders access
+            if(department in departmentSet and 'manage_task' not in get_perms(department.leaderGroup,self)):
+                assign_perm('manage_task',department.leaderGroup,self)
+            #otherwise remove access
+            elif(department not in departmentSet and 'manage_task' in get_perms(department.leaderGroup,self)):
+                remove_perm('manage_task',department.leaderGroup,self)
+        #make sure only the given students have task access
+        for student in Student.objects.all():
+            #if the student is in the given set, give them access
+            if(student in studentSet and not student.user.has_perm('manage_task',self)):
+                assign_perm('manage_task',student.user,self)
+            #otherwise remove access
+            elif(student not in studentSet and student.user.has_perm('manage_task',self)):
+                remove_perm('manage_task',student.user,self)
 
 #department model
 class Department(models.Model):

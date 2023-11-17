@@ -32,8 +32,10 @@ class taskDetailView(generic.DetailView):
     model = Task
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        print(context['object'].departments.all)
-        return super().get_context_data(**kwargs)
+        thisTask = context['object']
+        if(self.request.user.has_perm('task_tracker.manage_task',thisTask)):
+            context['can_edit'] = True
+        return context
     
 @login_required(login_url='login')
 def taskCreateView(request,**kwargs):
@@ -49,28 +51,38 @@ def taskCreateView(request,**kwargs):
 @login_required(login_url='login')
 def taskUpdateView(request,**kwargs):
     task = Task.objects.get(id=kwargs['pk'])
-    if request.method == 'POST':
-        form = TaskForm(request.POST,instance=task)
-        if form.is_valid():
-            form.save()
-            return redirect('task-detail-view',pk=kwargs['pk'])
+    #check user permissions
+    if request.user.has_perm('task_tracker.manage_task',task):
+        if request.method == 'POST':
+            form = TaskForm(request.POST,instance=task)
+            if form.is_valid():
+                form.save()
+                return redirect('task-detail-view',pk=kwargs['pk'])
+        else:
+            form = TaskForm(instance=task)
+            return render(request,'task_tracker/task_form.html',{'form':form})
     else:
-        form = TaskForm(instance=task)
-    return render(request,'task_tracker/task_form.html',{'form':form})
+        return HttpResponse("You do not have permission to edit this task")
+   
 
 @login_required(login_url='login')
 def taskDeleteView(request,**kwargs):
     task = Task.objects.get(id=kwargs['pk'])
-    if request.method == 'POST':
-        task.delete()
-        return redirect('task-list-view')
+    if request.user.has_perm('task_tracker.manage_task',task):
+        if request.method == 'POST':
+            task.delete()
+            return redirect('task-list-view')
+        else:
+            return render(request,'task_tracker/task_confirm_delete.html',{'task':task})
     else:
-        return render(request,'task_tracker/task_confirm_delete.html',{'task':task})
+        return HttpResponse("You do not have permission to delete this task")
     
 @login_required(login_url='login')
 def taskToggleCompleteView(request,**kwargs):
     task = Task.objects.get(id=kwargs['pk'])
-    task.is_complete = not task.is_complete
-    task.save()
+    #only change status if the user has permissions for that task
+    if request.user.has_perm('task_tracker.manage_task',task):
+        task.is_complete = not task.is_complete
+        task.save()
     #redirect to the page that made the request, makes the change seamless
     return redirect(request.META['HTTP_REFERER'])
