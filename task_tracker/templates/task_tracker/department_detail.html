@@ -15,6 +15,20 @@
       <li class="mt-4 list-group-item border-2 border-black">
         <p class="border-black">{{ department.description }}</p>
       </li>
+      <li class = "mt-4 list-group-item border-2 border-black">
+        <h3>Leader(s):</h3>
+        <ul>
+          {% for leader in leader_list %}
+            <li><a href="{%url 'student-detail-view' leader.id%}">{{ leader }}</a></li>
+          {% endfor %}
+        </ul>
+        <h3>Members:</h3>
+        <ul>
+          {% for member in member_list %}
+            <li><a href="{%url 'student-detail-view' member.id%}">{{ member }}</a></li>
+          {% endfor %}
+        </ul>
+      </li>
     </ul>
   </div>
 {% endblock %}

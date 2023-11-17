@@ -11,6 +11,13 @@ from django.contrib.auth.models import Group
 
 class departmentDetailView(generic.DetailView):
     model = Department
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['leader_list'] = getLeaderList(context['object'])
+        context['member_list'] = getMemberList(context['object'])
+        print(context['leader_list'])
+        print(context['member_list'])
+        return context
 
 
 class departmentListView(generic.ListView):
@@ -54,3 +61,17 @@ def departmentDeleteView(request,**kwargs):
         return redirect('department-list-view')
     else:
         return render(request,'task_tracker/department_confirm_delete.html',{'department':department})
+
+def getMemberList(department):
+    studentSet = Student.objects.all()
+    for student in studentSet:
+        if(department.memberGroup not in student.user.groups.all()):
+            studentSet = studentSet.exclude(id=student.id)
+    return studentSet
+
+def getLeaderList(department):
+    studentSet = Student.objects.all()
+    for student in studentSet:
+        if(department.leaderGroup not in student.user.groups.all()):
+            studentSet = studentSet.exclude(id=student.id)
+    return studentSet
