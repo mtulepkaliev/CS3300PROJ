@@ -101,6 +101,10 @@ class Department(models.Model):
     def __str__(self):
         return self.name
     
+    class Meta:
+        permissions = (
+            ('manage_department','Manage department'),
+        )
     #on creation, create a group for the department members and leaders
     def save(self,*args,**kwargs):
         #only run if the department is being created, not updated
@@ -111,7 +115,12 @@ class Department(models.Model):
             #create the groups and save them
             self.memberGroup = Group.objects.create(name=groupName)
             self.leaderGroup = Group.objects.create(name=leaderGroupName)
-        
+
+            #give the admin group and leader group permission to manage the department
+            adminGroup = Group.objects.get(name='admin')
+            assign_perm('manage_department',adminGroup,self)
+            assign_perm('manage_department',self.leaderGroup,self)
+            
             super().save(*args,**kwargs)
         else:
             kwargs['force_insert'] = False
@@ -120,6 +129,10 @@ class Department(models.Model):
     
     #on deletion delete the associated groups
     def delete(self,*args,**kwargs):
+        adminGroup = Group.objects.get(name='admin')
+        remove_perm('manage_department',adminGroup,self)
+        remove_perm('manage_department',self.leaderGroup,self)
+
         self.memberGroup.delete()
         self.leaderGroup.delete()
         super().delete(self,*args,**kwargs)

@@ -5,6 +5,9 @@ from task_tracker.models import *
 
 class TaskAdmin(GuardedModelAdmin):
     pass
+
+class DepartmentAdmin(GuardedModelAdmin):
+    pass
 admin.site.register(Task,TaskAdmin)
-admin.site.register(Department)
+admin.site.register(Department,DepartmentAdmin)
 admin.site.register(Student)

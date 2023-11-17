@@ -5,7 +5,9 @@
   <div class="container-fluid ">
     <div class="mx-4 mt-3">
       <h2 class="float-start ">Departments</h2>
+      {% if is_admin%}
       <a class="btn btn-primary float-end" href="{% url 'department-create-view' %}">Create Department</a>
+      {%endif%}
     </div>
   </div>
   

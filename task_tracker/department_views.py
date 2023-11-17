@@ -15,8 +15,8 @@ class departmentDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['leader_list'] = getLeaderList(context['object'])
         context['member_list'] = getMemberList(context['object'])
-        print(context['leader_list'])
-        print(context['member_list'])
+        if(self.request.user.has_perm('task_tracker.manage_department',context['object'])):
+            context['can_edit'] = True
         return context
 
 
@@ -27,40 +27,50 @@ class departmentListView(generic.ListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['wtf_department_solution_list'] = Department.objects.all()
-        print(context['wtf_department_solution_list'])
+        if(self.request.user.groups.filter(name='admin').exists()):
+            context['is_admin'] = True
         return context
     
 @login_required(login_url='login')
 def departmentCreateView(request,**kwargs):
-    if request.method == 'POST':
-        form = CreateDepartmentForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('task-list-view')
+    if request.user.groups.filter(name='admin').exists():
+        if request.method == 'POST':
+            form = CreateDepartmentForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('task-list-view')
+        else:
+            form = CreateDepartmentForm()
+        return render(request,'task_tracker/department_form.html',{'form':form})
     else:
-        form = CreateDepartmentForm()
-    return render(request,'task_tracker/department_form.html',{'form':form})
+        return HttpResponse("You do not have permission to create a department")
 
 @login_required(login_url='login')
 def departmentUpdateView(request,**kwargs):
     department = Department.objects.get(id=kwargs['pk'])
-    if request.method == 'POST':
-        form = CreateDepartmentForm(request.POST,instance=department)
-        if form.is_valid():
-            form.save()
-            return redirect('department-detail-view',pk=kwargs['pk'])
+    if request.user.has_perm('task_tracker.manage_department',department):
+        if request.method == 'POST':
+            form = CreateDepartmentForm(request.POST,instance=department)
+            if form.is_valid():
+                form.save()
+                return redirect('department-detail-view',pk=kwargs['pk'])
+        else:
+            form = CreateDepartmentForm(instance=department)
+        return render(request,'task_tracker/department_form.html',{'form':form})
     else:
-        form = CreateDepartmentForm(instance=department)
-    return render(request,'task_tracker/department_form.html',{'form':form})
+        return HttpResponse("You do not have permission to edit this department")
 
 @login_required(login_url='login')
 def departmentDeleteView(request,**kwargs):
     department = Department.objects.get(id=kwargs['pk'])
-    if request.method == 'POST':
-        department.delete()
-        return redirect('department-list-view')
+    if request.user.has_perm('task_tracker.manage_department',department):
+        if request.method == 'POST':
+            department.delete()
+            return redirect('department-list-view')
+        else:
+            return render(request,'task_tracker/department_confirm_delete.html',{'department':department})
     else:
-        return render(request,'task_tracker/department_confirm_delete.html',{'department':department})
+        return HttpResponse("You do not have permission to delete this department")
 
 def getMemberList(department):
     studentSet = Student.objects.all()
