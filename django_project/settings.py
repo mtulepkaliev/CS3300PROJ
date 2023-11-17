@@ -43,11 +43,14 @@ INSTALLED_APPS = [
     'bootstrap5',
     'crispy_forms',
     "crispy_bootstrap5",
+    'guardian',
+    'searchableselect',
 ]
 
 # Add support for authenticating users
 AUTHENTICATION_BACKENDS = [
 'django.contrib.auth.backends.ModelBackend',
+'guardian.backends.ObjectPermissionBackend',
 ]
 
 
