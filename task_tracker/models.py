@@ -52,12 +52,20 @@ class Department(models.Model):
     
     #on creation, create a group for the department members and leaders
     def save(self,*args,**kwargs):
-        groupName = self.name + "Members"
-        leaderGroupName = self.name + "Leaders"
-        #create the groups
-        group = Group.objects.create(name=groupName)
-        leaderGroup = Group.objects.create(name=leaderGroupName)
-        super().save(self,*args,**kwargs)
+        #only run if the department is being created, not updated
+        if(not self.pk):
+            print("department does not yet exist")
+            groupName = self.name + "Members"
+            leaderGroupName = self.name + "Leaders"
+            #create the groups
+            group = Group.objects.create(name=groupName)
+            leaderGroup = Group.objects.create(name=leaderGroupName)
+        
+            super().save(*args,**kwargs)
+        else:
+            kwargs['force_insert'] = False
+            kwargs['force_update'] = True
+            super().save(*args,**kwargs)
     
     #on deletion delete the associated groups
     def delete(self,*args,**kwargs):

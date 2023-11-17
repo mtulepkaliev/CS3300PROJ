@@ -44,6 +44,10 @@
                 <a class="nav-link" href="{% url 'login' %}">Login</a>
               {% endif %}
             </li>
+            {% if department_list%}
+              <a class="nav-link" href="{% url 'department-list-view'%}">Departments</a>
+            </li>
+            {% endif %}
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Theme</a>
               <ul class="dropdown-menu bg-dark">

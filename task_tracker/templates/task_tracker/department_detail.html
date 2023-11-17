@@ -5,6 +5,10 @@
       <li class="list-group-item border-0">
         <div class="mt-2 me-5">
           <h2 class="float-start">{{ department.name }} Department</h2>
+
+          <!-- delete and edit buttons-->
+          <a href="{% url 'department-delete-view' department.id %}" class="btn btn-danger float-end ms-3">Delete Department</a>
+          <a href="{% url 'department-update-view' department.id %}" class="btn btn-primary float-end ms-3">Edit Department</a>
         </div>
       </li>
 

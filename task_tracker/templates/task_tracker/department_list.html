@@ -1,0 +1,46 @@
+{% extends 'task_tracker/base_template.html' %}
+{% block content %}
+
+  <!-- header with create task button-->
+  <div class="container-fluid ">
+    <div class="mx-4 mt-3">
+      <h2 class="float-start ">Departments</h2>
+      <a class="btn btn-primary float-end" href="{% url 'department-create-view' %}">Create Department</a>
+    </div>
+  </div>
+  
+  {% if 'wtf_department_solution_list' %}
+  <div class="container-fluid px-4">
+    <table class="table table-striped">
+      
+      <!-- table headings-->
+      <thead>
+        <tr>
+          <th scope="col"><h3>Name</h3></th>
+          <th class="w-75" scope="col"><h3>Description</h3></th>
+          <th scope="col"><h3>Leader(s)</h3></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- task loop-->
+        {% for department in wtf_department_solution_list %}
+          <tr>
+            <td>
+              <h4><a class="link-primary " href="{%url 'department-detail-view' department.id %}">{{ department.name }}</a></h4>
+            </td>
+            <td>
+              <p>{{ department.description }}</p>
+            </td>
+            <td>
+              <h5></h5>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  {% else %}
+    <h4 class="container-fluid float-start mx-4">No departments exist</h4>
+  {% endif %}
+</div>
+{% endblock %}

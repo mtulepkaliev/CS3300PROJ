@@ -40,6 +40,17 @@ class departmentDetailView(generic.DetailView):
 class studentDetailView(generic.DetailView):
     model = Student
 
+class departmentListView(generic.ListView):
+    model = Department
+    template_name = 'task_tracker/department_list.html'
+    context_object_name = 'department_list'
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['wtf_department_solution_list'] = Department.objects.all()
+        print(context['wtf_department_solution_list'])
+        return context
+
+
 @login_required(login_url='login')
 def taskCreateView(request,**kwargs):
     if request.method == 'POST':
@@ -90,6 +101,27 @@ def departmentCreateView(request,**kwargs):
     else:
         form = CreateDepartmentForm()
     return render(request,'task_tracker/department_form.html',{'form':form})
+
+@login_required(login_url='login')
+def departmentUpdateView(request,**kwargs):
+    department = Department.objects.get(id=kwargs['pk'])
+    if request.method == 'POST':
+        form = CreateDepartmentForm(request.POST,instance=department)
+        if form.is_valid():
+            form.save()
+            return redirect('department-detail-view',pk=kwargs['pk'])
+    else:
+        form = CreateDepartmentForm(instance=department)
+    return render(request,'task_tracker/department_form.html',{'form':form})
+
+@login_required(login_url='login')
+def departmentDeleteView(request,**kwargs):
+    department = Department.objects.get(id=kwargs['pk'])
+    if request.method == 'POST':
+        department.delete()
+        return redirect('department-list-view')
+    else:
+        return render(request,'task_tracker/department_confirm_delete.html',{'department':department})
 
 def registerPage(request):
 
