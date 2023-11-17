@@ -8,6 +8,9 @@ class TaskAdmin(GuardedModelAdmin):
 
 class DepartmentAdmin(GuardedModelAdmin):
     pass
+
+class StudentAdmin(GuardedModelAdmin):
+    pass
 admin.site.register(Task,TaskAdmin)
 admin.site.register(Department,DepartmentAdmin)
-admin.site.register(Student)
+admin.site.register(Student,StudentAdmin)

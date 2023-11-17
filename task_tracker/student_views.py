@@ -14,7 +14,8 @@ class studentDetailView(generic.DetailView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['student_department_list'] = getStudentMembership(context['object'])
-        print(context['student_department_list'])
+        if(self.request.user.has_perm('task_tracker.manage_student',context['object'])):
+            context['can_edit'] = True
         return context
 
 #view for the register page
@@ -59,28 +60,34 @@ def registerPage(request):
 @login_required(login_url='login')
 def studentDeleteView(request,**kwargs):
     student = Student.objects.get(id=kwargs['pk'])
-    if request.method == 'POST':
-        student.user.delete()
-        student.delete()
-        return redirect('login')
+    if(request.user.has_perm('task_tracker.manage_student',student)):
+        if request.method == 'POST':
+            student.user.delete()
+            student.delete()
+            return redirect('login')
+        else:
+            return render(request,'task_tracker/student_confirm_delete.html',{'student':student})
     else:
-        return render(request,'task_tracker/student_confirm_delete.html',{'student':student})
+        return HttpResponse("You do not have permission to delete this student")
 
 @login_required(login_url='login')
 def studentUpdateView(request,**kwargs):
     student = Student.objects.get(id=kwargs['pk'])
-    if request.method == 'POST':
-        form = UpdateStudentForm(request.POST,instance=student)
-        if form.is_valid():
-            departmentMembership = form.cleaned_data['departments']
-            updateStudentMembership(student,departmentMembership)
-            form.save()
-            return redirect('student-detail-view',pk=kwargs['pk'])
+    if(request.user.has_perm('task_tracker.manage_student',student)):
+        if request.method == 'POST':
+            form = UpdateStudentForm(request.POST,instance=student)
+            if form.is_valid():
+                departmentMembership = form.cleaned_data['departments']
+                updateStudentMembership(student,departmentMembership)
+                form.save()
+                return redirect('student-detail-view',pk=kwargs['pk'])
+        else:
+            form = UpdateStudentForm(instance=student)
+            #https://stackoverflow.com/questions/26966527/django-modelmultiplechoicefield-set-initial-values
+            form.fields['departments'].initial = getStudentMembership(student)
+        return render(request,'task_tracker/student_update_form.html',{'form':form})
     else:
-        form = UpdateStudentForm(instance=student)
-        #https://stackoverflow.com/questions/26966527/django-modelmultiplechoicefield-set-initial-values
-        form.fields['departments'].initial = getStudentMembership(student)
-    return render(request,'task_tracker/student_update_form.html',{'form':form})
+        return HttpResponse("You do not have permission to edit this student")
 
 
 #given a student instance and the departments they are supposed to be a member of

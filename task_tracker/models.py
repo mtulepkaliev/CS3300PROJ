@@ -120,7 +120,7 @@ class Department(models.Model):
             adminGroup = Group.objects.get(name='admin')
             assign_perm('manage_department',adminGroup,self)
             assign_perm('manage_department',self.leaderGroup,self)
-            
+
             super().save(*args,**kwargs)
         else:
             kwargs['force_insert'] = False
@@ -162,3 +162,26 @@ class Student(models.Model):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+    
+    class Meta:
+        permissions = (
+            ('manage_student','Manage student'),
+        )
+        ordering = ['first_name','last_name']
+
+    def save(self,*args,**kwargs):
+        #only run if the student is being created, not updated
+        if(not self.pk):
+            #give the admin group amd the student's user permission to manage the student
+            adminGroup = Group.objects.get(name='admin')
+            assign_perm('manage_student',adminGroup,self)
+            assign_perm('manage_student',self.user,self)
+        super().save(*args,**kwargs)
+    
+    def delete(self,*args,**kwargs):
+        adminGroup = Group.objects.get(name='admin')
+        remove_perm('manage_student',adminGroup,self)
+        remove_perm('manage_student',self.user,self)
+
+        self.user.delete()
+        super().delete(self,*args,**kwargs)

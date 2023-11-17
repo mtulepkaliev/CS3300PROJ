@@ -7,6 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 
 class TaskForm(ModelForm):
+    assignedStudents = forms.ModelMultipleChoiceField(queryset=Student.objects.order_by("first_name","last_name"),required=False)
     class Meta:
         model = Task
         fields = ['summary','detail','deadline','priority','departments','parent_task','assignedStudents']
