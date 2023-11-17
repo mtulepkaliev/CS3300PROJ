@@ -50,3 +50,53 @@ def registerPage(request):
 
     context = {'form':form}
     return render(request,'registration/register.html',context)
+
+@login_required(login_url='login')
+def studentDeleteView(request,**kwargs):
+    student = Student.objects.get(id=kwargs['pk'])
+    if request.method == 'POST':
+        student.user.delete()
+        student.delete()
+        return redirect('login')
+    else:
+        return render(request,'task_tracker/student_confirm_delete.html',{'student':student})
+
+@login_required(login_url='login')
+def studentUpdateView(request,**kwargs):
+    student = Student.objects.get(id=kwargs['pk'])
+    if request.method == 'POST':
+        form = UpdateStudentForm(request.POST,instance=student)
+        if form.is_valid():
+            departmentMembership = form.cleaned_data['departments']
+            updateStudentMembership(student,departmentMembership)
+            form.save()
+            return redirect('student-detail-view',pk=kwargs['pk'])
+    else:
+        form = UpdateStudentForm(instance=student)
+        #https://stackoverflow.com/questions/26966527/django-modelmultiplechoicefield-set-initial-values
+        form.fields['departments'].initial = getStudentMembership(student)
+    return render(request,'task_tracker/student_update_form.html',{'form':form})
+
+
+#given a student instance and the departments they are supposed to be a member of
+#update their membership
+def updateStudentMembership(student:Student,departmentMembership):
+    #go through all depts
+    for department in Department.objects.all():
+        #make sure student is member if not already
+        if(department in departmentMembership and student.user not in department.memberGroup.user_set.all()):
+            student.user.groups.add(department.memberGroup)
+        #remove mebership if they are not supposed to be a member anymore
+        elif(department not in departmentMembership and student.user in department.memberGroup.user_set.all()):
+            student.user.groups.remove(department.memberGroup)
+            
+#gets all the departments the student is a member of
+def getStudentMembership(student:Student):
+    #get all depts
+    departmentQuerySet = Department.objects.all()
+    for department in departmentQuerySet:
+        #remove depts that the student is not a member of
+        if(student.user not in department.memberGroup.user_set.all()):
+            departmentQuerySet = departmentQuerySet.exclude(id=department.id)
+    return departmentQuerySet
+            

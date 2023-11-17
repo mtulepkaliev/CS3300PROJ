@@ -31,13 +31,25 @@ class CreateUserForm(UserCreationForm):
         fields = ['username','email','password1','password2']
 
 class CreateStudentForm(ModelForm):
+    #form fields to be passed to the user form
     username = forms.CharField(max_length=200)
     email = forms.EmailField()
     password1 = forms.CharField(max_length=200,widget=forms.PasswordInput())
     password2 = forms.CharField(max_length=200,widget=forms.PasswordInput())
+
+    departments = forms.ModelMultipleChoiceField(queryset=Department.objects.all(),widget=forms.CheckboxSelectMultiple())
+
+    
     class Meta:
         model = Student
-        fields = []
+        fields = ['first_name',"last_name"]
+
+class UpdateStudentForm(ModelForm):
+    departments = forms.ModelMultipleChoiceField(queryset=Department.objects.all(),widget=forms.CheckboxSelectMultiple())
+
+    class Meta:
+        model = Student
+        fields = ['first_name',"last_name"]
 
 class CreateDepartmentForm(ModelForm):
     class Meta:

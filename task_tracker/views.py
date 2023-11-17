@@ -13,3 +13,6 @@ from django.contrib.auth.models import Group
 def index(request):
 # Render the HTML template index.html with the data in the context variable.
    return render(request, 'task_tracker/index.html')
+
+def profile(request):
+    return redirect('student-detail-view',pk=request.user.student.id)

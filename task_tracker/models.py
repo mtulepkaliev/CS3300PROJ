@@ -47,6 +47,8 @@ class Task(models.Model):
 class Department(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(max_length=1000)
+    memberGroup = models.OneToOneField(Group,on_delete=models.CASCADE,null=True,blank=True,related_name="member_group")
+    leaderGroup = models.OneToOneField(Group,on_delete=models.CASCADE,null=True,blank=True,related_name="leader_group")
     def __str__(self):
         return self.name
     
@@ -57,9 +59,9 @@ class Department(models.Model):
             print("department does not yet exist")
             groupName = self.name + "Members"
             leaderGroupName = self.name + "Leaders"
-            #create the groups
-            group = Group.objects.create(name=groupName)
-            leaderGroup = Group.objects.create(name=leaderGroupName)
+            #create the groups and save them
+            self.memberGroup = Group.objects.create(name=groupName)
+            self.leaderGroup = Group.objects.create(name=leaderGroupName)
         
             super().save(*args,**kwargs)
         else:
@@ -69,13 +71,8 @@ class Department(models.Model):
     
     #on deletion delete the associated groups
     def delete(self,*args,**kwargs):
-        groupName = self.name + "Members"
-        leaderGroupName = self.name + "Leaders"
-        #delete the groups
-        group = Group.objects.get(name=groupName)
-        leaderGroup = Group.objects.get(name=leaderGroupName)
-        group.delete()
-        leaderGroup.delete()
+        self.memberGroup.delete()
+        self.leaderGroup.delete()
         super().delete(self,*args,**kwargs)
     
 

@@ -28,6 +28,10 @@ path('departments/update/<int:pk>',department_views.departmentUpdateView,name='d
 
 path('students/register',student_views.registerPage,name='student-register-page'),
 path('students/<int:pk>/',student_views.studentDetailView.as_view(),name='student-detail-view'),
+path('students/delete/<int:pk>',student_views.studentDeleteView,name='student-delete-view'),
+path('students/update/<int:pk>',student_views.studentUpdateView,name='student-update-view'),
+
+path('accounts/profile/',views.profile,name='profile'),
 ]
 urlpatterns += [
     path('accounts/', include('django.contrib.auth.urls')),
