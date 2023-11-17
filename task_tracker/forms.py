@@ -9,7 +9,7 @@ from django.contrib.auth.forms import UserCreationForm
 class TaskForm(ModelForm):
     class Meta:
         model = Task
-        fields = ['summary','detail','deadline','priority','departments','parent_task']
+        fields = ['summary','detail','deadline','priority','departments','parent_task','assignedStudents']
         #override dealdine to use a date picker
         widgets = {
             'deadline': forms.DateInput(attrs={'type': 'date'}),
@@ -24,6 +24,7 @@ class TaskForm(ModelForm):
             'priority': 'Priority',
             'departments': 'Department',
             'parent_task': 'Parent Task (Optional)',
+            'assignedStudents': 'Assigned Students (Optional)',
         }
 
 class CreateUserForm(UserCreationForm):

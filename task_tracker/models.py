@@ -19,6 +19,9 @@ class Task(models.Model):
     #M:N relationship with Department
     departments = models.ManyToManyField('Department',related_name="tasks",blank=True)
 
+    #M;N relationship with Student
+    assignedStudents = models.ManyToManyField('Student',related_name="assignedTasks",blank=True)
+
     def __str__(self):
         return self.summary
     
