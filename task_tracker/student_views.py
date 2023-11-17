@@ -11,6 +11,11 @@ from django.contrib.auth.models import Group
 
 class studentDetailView(generic.DetailView):
     model = Student
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['department_list'] = getStudentMembership(context['object'])
+        print(context['department_list'])
+        return context
 
 #view for the register page
 def registerPage(request):
