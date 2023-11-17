@@ -4,7 +4,7 @@
   <!-- header with create task button-->
   <div class="container-fluid ">
     <div class="mx-4 mt-3">
-      <h2 class="float-start ">Tasks</h2>
+      <h2 class="float-start ">{% if department%} {{department.name}} {% endif%}Tasks</h2>
       <a class="btn btn-primary float-end" href="{% url 'task-create-view' %}">Create Task</a>
     </div>
   </div>

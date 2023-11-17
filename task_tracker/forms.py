@@ -13,6 +13,7 @@ class TaskForm(ModelForm):
         #override dealdine to use a date picker
         widgets = {
             'deadline': forms.DateInput(attrs={'type': 'date'}),
+            'departments': forms.CheckboxSelectMultiple(),
         }
 
         #custom labels for the form

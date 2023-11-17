@@ -22,6 +22,11 @@ class taskListView(generic.ListView):
             return Task.objects.all().order_by('is_complete','deadline','priority')
         else:
             return Task.objects.filter(departments=self.kwargs['department_id']).order_by('is_complete','deadline','priority')
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        if('department_id' in self.kwargs):
+            context['department'] = Department.objects.get(id=self.kwargs['department_id'])
+        return context
 
 class taskDetailView(generic.DetailView):
     model = Task
