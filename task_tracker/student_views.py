@@ -14,7 +14,7 @@ class studentDetailView(generic.DetailView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['student_department_list'] = getStudentMembership(context['object'])
-        if(self.request.user.has_perm('task_tracker.manage_student',context['object'])):
+        if(self.request.user.is_authenticated and self.request.user.has_perm('task_tracker.manage_student',context['object'])):
             context['can_edit'] = True
         return context
 
@@ -49,10 +49,19 @@ def registerPage(request):
             studentGroup = Group.objects.get(name='student')
             user.groups.add(studentGroup)
             student = Student.objects.create(user=user)
+            student.first_name = form.cleaned_data['first_name']
+            student.last_name = form.cleaned_data['last_name']
             student.save()
+            updateStudentMembership(student,form.cleaned_data['departments'])
 
             messages.success(request,'Account was created for ' + username)
             return redirect('login')
+        else:
+            print(form.errors)
+            print("form is invalid")
+            messages.error(request,'Form is invalid')
+            context = {'form':form}
+            return render(request,'registration/register.html',context)
 
     context = {'form':form}
     return render(request,'registration/register.html',context)
@@ -73,7 +82,7 @@ def studentDeleteView(request,**kwargs):
 @login_required(login_url='login')
 def studentUpdateView(request,**kwargs):
     student = Student.objects.get(id=kwargs['pk'])
-    if(request.user.has_perm('task_tracker.manage_student',student)):
+    if( request.user.has_perm('task_tracker.manage_student',student)):
         if request.method == 'POST':
             form = UpdateStudentForm(request.POST,instance=student)
             if form.is_valid():

@@ -116,12 +116,13 @@ class Department(models.Model):
             self.memberGroup = Group.objects.create(name=groupName)
             self.leaderGroup = Group.objects.create(name=leaderGroupName)
 
+            super().save(*args,**kwargs)
+            
             #give the admin group and leader group permission to manage the department
             adminGroup = Group.objects.get(name='admin')
             assign_perm('manage_department',adminGroup,self)
             assign_perm('manage_department',self.leaderGroup,self)
 
-            super().save(*args,**kwargs)
         else:
             kwargs['force_insert'] = False
             kwargs['force_update'] = True
@@ -135,7 +136,8 @@ class Department(models.Model):
 
         self.memberGroup.delete()
         self.leaderGroup.delete()
-        super().delete(self,*args,**kwargs)
+        
+        super().delete()
     
     @property
     def member_list(self):
@@ -174,14 +176,17 @@ class Student(models.Model):
         if(not self.pk):
             #give the admin group amd the student's user permission to manage the student
             adminGroup = Group.objects.get(name='admin')
+            super().save(*args,**kwargs)
             assign_perm('manage_student',adminGroup,self)
             assign_perm('manage_student',self.user,self)
-        super().save(*args,**kwargs)
+        else:
+            super().save(*args,**kwargs)
+        
     
     def delete(self,*args,**kwargs):
         adminGroup = Group.objects.get(name='admin')
         remove_perm('manage_student',adminGroup,self)
         remove_perm('manage_student',self.user,self)
 
-        self.user.delete()
-        super().delete(self,*args,**kwargs)
+        #self.user.delete()
+        super().delete()

@@ -33,7 +33,7 @@ class taskDetailView(generic.DetailView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         thisTask = context['object']
-        if(self.request.user.has_perm('task_tracker.manage_task',thisTask)):
+        if(self.request.user.is_authenticated and self.request.user.has_perm('task_tracker.manage_task',thisTask)):
             context['can_edit'] = True
         return context
     

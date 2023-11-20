@@ -44,9 +44,7 @@
               </ul>
             </li>
             <li class="nav-item">
-              {% if department_list %}
                 <a class="nav-link" href="{% url 'department-list-view' %}">Departments</a>
-              {% endif %}
             </li>
             {% if user.is_authenticated %}
               <li class="nav-item">

@@ -15,7 +15,7 @@ class departmentDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['leader_list'] = context['object'].leader_list
         context['member_list'] = context['object'].member_list
-        if(self.request.user.has_perm('task_tracker.manage_department',context['object'])):
+        if(self.request.user.is_authenticated and self.request.user.has_perm('task_tracker.manage_department',context['object'])):
             context['can_edit'] = True
         return context
 
