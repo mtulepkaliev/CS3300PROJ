@@ -29,7 +29,6 @@ class departmentListView(generic.ListView):
         context['wtf_department_solution_list'] = Department.objects.all()
         if(self.request.user.groups.filter(name='admin').exists()):
             context['is_admin'] = True
-        print(context)
         return context
     
 @login_required(login_url='login')

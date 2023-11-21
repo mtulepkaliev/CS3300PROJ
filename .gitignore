@@ -2,7 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,python,django,git
 
 coverageReport.txt
-
+chromedriver*
 ### Django ###
 *.log
 *.pot
