@@ -56,4 +56,3 @@ class StudentTest(TestCase):
         self.assertEqual(self.student.user.email,'test@email.com')
         self.assertEqual(self.student.user.groups.get(name='student').name,'student')
         self.assertIn(Group.objects.get(name='TestMembers'),self.student.user.groups.all())
-        self.assertEqual(0,1)
