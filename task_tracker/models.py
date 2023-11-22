@@ -190,3 +190,24 @@ class Student(models.Model):
 
         #self.user.delete()
         super().delete()
+
+    #gets all the departments this student is a member of
+    def getMembership(self):
+        #get all depts
+        departmentQuerySet = Department.objects.all()
+        for department in departmentQuerySet:
+            #remove depts that the student is not a member of
+            if(self.user not in department.memberGroup.user_set.all() and self.user not in department.leaderGroup.user_set.all()):
+                departmentQuerySet = departmentQuerySet.exclude(id=department.id)
+        return departmentQuerySet
+    
+    #update this student's department membership given a set of departments they should be a member of
+    def updateMembership(self,departmentMembership):
+        #go through all depts
+        for department in Department.objects.all():
+            #make sure student is member if not already
+            if(department in departmentMembership and self.user not in department.memberGroup.user_set.all()):
+                self.user.groups.add(department.memberGroup)
+            #remove mebership if they are not supposed to be a member anymore
+            elif(department not in departmentMembership and self.user in department.memberGroup.user_set.all()):
+                self.user.groups.remove(department.memberGroup)
