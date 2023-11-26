@@ -43,6 +43,8 @@ def taskCreateView(request,**kwargs):
         form = TaskForm(request.POST)
         if form.is_valid():
             form.save()
+            task = form.instance
+            task.updatePermissions(task.departments.all(),task.assignedStudents.all())
             return redirect('task-list-view')
     else:
         form = TaskForm()
@@ -57,6 +59,8 @@ def taskUpdateView(request,**kwargs):
             form = TaskForm(request.POST,instance=task)
             if form.is_valid():
                 form.save()
+                task = form.instance
+                task.updatePermissions(task.departments.all(),task.assignedStudents.all())
                 return redirect('task-detail-view',pk=kwargs['pk'])
         else:
             form = TaskForm(instance=task)

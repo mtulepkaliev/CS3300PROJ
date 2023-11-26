@@ -31,23 +31,13 @@ class Task(models.Model):
     def save(self, *args, **kwargs):
         #if the task is being created, not updated
         if(not self.pk):
+            super().save(*args, **kwargs)
             #give the admin group permission to manage the task
             adminGroup = Group.objects.get(name='admin')
             assign_perm('manage_task',adminGroup,self)
-        
-        self.updatePermissions(self.departments.all(),self.assignedStudents.all())
+        else:
+            self.updatePermissions(self.departments.all(),self.assignedStudents.all())
 
-        #propogate department permissions to children
-        if self.child_tasks:
-            for child in self.child_tasks:
-                
-                #if the child is not in the same departments as the parent, add the parent's departments to the child
-                for department in self.departments.all():
-                    if not department in child.departments.all():
-                        child.departments.add(department)
-                
-                #add the department permissions to the child
-                child.updatePermissions(self.departments.all(),child.assignedStudents.all())
         return super().save(*args, **kwargs)
     def __str__(self):
         return self.summary
@@ -72,9 +62,22 @@ class Task(models.Model):
                 if task.child_tasks:
                     childTasks = childTasks | task.child_tasks
             return childTasks
-    
+    def propogatePermissions(self):
+        #propogate department permissions to children
+        if self.child_tasks:
+            for child in self.child_tasks:
+                
+                #if the child is not in the same departments as the parent, add the parent's departments to the child
+                for department in self.departments.all():
+                    if not department in child.departments.all():
+                        child.departments.add(department)
+                
+                #add the department permissions to the child
+                child.updatePermissions(self.departments.all(),child.assignedStudents.all())
+
     #updates the task's permissions based on the departments and students it is assigned to
     def updatePermissions(self,departmentSet,studentSet):
+        print(f"updating permissions {departmentSet} {studentSet}")
         #make sure only the given department leaders have task access
         for department in Department.objects.all():
             #if the department is in the given set, give the department leaders access
@@ -91,6 +94,7 @@ class Task(models.Model):
             #otherwise remove access
             elif(student not in studentSet and student.user.has_perm('manage_task',self)):
                 remove_perm('manage_task',student.user,self)
+        self.propogatePermissions()
 
 #department model
 class Department(models.Model):
