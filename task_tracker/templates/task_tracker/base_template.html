@@ -1,4 +1,7 @@
 {% load static %}
+{% load tags %}
+{% department_name_id_dict request as department_list %}
+
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
   <head>
@@ -27,8 +30,33 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'index' %}">Home</a>
             </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Tasks</a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="{% url 'task-list-view' %}">All Tasks</a>
+                </li>
+                {% for department in department_list %}
+                  <li>
+                    <a class="dropdown-item" href="{% url 'task-list-department-view' department.id %}">{{ department.name }} Tasks</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'task-list-view' %}">Tasks</a>
+                <a class="nav-link" href="{% url 'department-list-view' %}">Departments</a>
+            </li>
+            {% if user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'profile' %}">My Profile</a>
+              </li>
+            {% endif %}
+            <li class="nav-item">
+              {% if user.is_authenticated %}
+                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+              {% else %}
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+              {% endif %}
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Theme</a>

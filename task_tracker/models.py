@@ -1,11 +1,11 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User,Group
+from guardian.shortcuts import assign_perm,get_perms,remove_perm
 
 # Create your models here.
 class Task(models.Model):
 
-    #TODO remove this as we will be implementing department model later
-    department_choices = [("All","ALL"),("EE","Electrical"), ("MECH","Mechanical"),("BUS","Business")]
     
     priority_choices = [(3,"LOW"),(2,"MEDIUM"),(1,"HIGH")]
 
@@ -17,9 +17,28 @@ class Task(models.Model):
     priority = models.IntegerField(choices=priority_choices,default=3,null=False,blank=False)
     parent_task = models.ForeignKey('self',related_name="children",on_delete=models.CASCADE,blank=True,null=True)
 
-    #TODO change to FK
-    department = models.CharField(max_length=200,choices=department_choices,default="All",blank=False)
+    #M:N relationship with Department
+    departments = models.ManyToManyField('Department',related_name="tasks",blank=True)
 
+    #M;N relationship with Student
+    assignedStudents = models.ManyToManyField('Student',related_name="assignedTasks",blank=True)
+
+    class Meta:
+        permissions = (
+            ('manage_task','Manage task'),
+        )
+
+    def save(self, *args, **kwargs):
+        #if the task is being created, not updated
+        if(not self.pk):
+            super().save(*args, **kwargs)
+            #give the admin group permission to manage the task
+            adminGroup = Group.objects.get(name='admin')
+            assign_perm('manage_task',adminGroup,self)
+        else:
+            self.updatePermissions(self.departments.all(),self.assignedStudents.all())
+
+        return super().save(*args, **kwargs)
     def __str__(self):
         return self.summary
     
@@ -43,3 +62,156 @@ class Task(models.Model):
                 if task.child_tasks:
                     childTasks = childTasks | task.child_tasks
             return childTasks
+    def propogatePermissions(self):
+        #propogate department permissions to children
+        if self.child_tasks:
+            for child in self.child_tasks:
+                
+                #if the child is not in the same departments as the parent, add the parent's departments to the child
+                for department in self.departments.all():
+                    if not department in child.departments.all():
+                        child.departments.add(department)
+                
+                #add the department permissions to the child
+                child.updatePermissions(self.departments.all(),child.assignedStudents.all())
+
+    #updates the task's permissions based on the departments and students it is assigned to
+    def updatePermissions(self,departmentSet,studentSet):
+        print(f"updating permissions {departmentSet} {studentSet}")
+        #make sure only the given department leaders have task access
+        for department in Department.objects.all():
+            #if the department is in the given set, give the department leaders access
+            if(department in departmentSet and 'manage_task' not in get_perms(department.leaderGroup,self)):
+                assign_perm('manage_task',department.leaderGroup,self)
+            #otherwise remove access
+            elif(department not in departmentSet and 'manage_task' in get_perms(department.leaderGroup,self)):
+                remove_perm('manage_task',department.leaderGroup,self)
+        #make sure only the given students have task access
+        for student in Student.objects.all():
+            #if the student is in the given set, give them access
+            if(student in studentSet and not student.user.has_perm('manage_task',self)):
+                assign_perm('manage_task',student.user,self)
+            #otherwise remove access
+            elif(student not in studentSet and student.user.has_perm('manage_task',self)):
+                remove_perm('manage_task',student.user,self)
+        self.propogatePermissions()
+
+#department model
+class Department(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(max_length=1000)
+    memberGroup = models.OneToOneField(Group,on_delete=models.CASCADE,null=True,blank=True,related_name="member_group")
+    leaderGroup = models.OneToOneField(Group,on_delete=models.CASCADE,null=True,blank=True,related_name="leader_group")
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        permissions = (
+            ('manage_department','Manage department'),
+        )
+    #on creation, create a group for the department members and leaders
+    def save(self,*args,**kwargs):
+        #only run if the department is being created, not updated
+        if(not self.pk):
+            print("department does not yet exist")
+            groupName = self.name + "Members"
+            leaderGroupName = self.name + "Leaders"
+            #create the groups and save them
+            self.memberGroup = Group.objects.create(name=groupName)
+            self.leaderGroup = Group.objects.create(name=leaderGroupName)
+
+            super().save(*args,**kwargs)
+            
+            #give the admin group and leader group permission to manage the department
+            adminGroup = Group.objects.get(name='admin')
+            assign_perm('manage_department',adminGroup,self)
+            assign_perm('manage_department',self.leaderGroup,self)
+
+        else:
+            kwargs['force_insert'] = False
+            kwargs['force_update'] = True
+            super().save(*args,**kwargs)
+    
+    #on deletion delete the associated groups
+    def delete(self,*args,**kwargs):
+        adminGroup = Group.objects.get(name='admin')
+        remove_perm('manage_department',adminGroup,self)
+        remove_perm('manage_department',self.leaderGroup,self)
+
+        self.memberGroup.delete()
+        self.leaderGroup.delete()
+        
+        super().delete()
+    
+    @property
+    def member_list(self):
+        studentSet = Student.objects.all()
+        for student in studentSet:
+            if(self.memberGroup not in student.user.groups.all()):
+                studentSet = studentSet.exclude(id=student.id)
+        return studentSet
+
+    @property
+    def leader_list(self):
+        studentSet = Student.objects.all()
+        for student in studentSet:
+            if(self.leaderGroup not in student.user.groups.all()):
+                studentSet = studentSet.exclude(id=student.id)
+        return studentSet
+
+#each student maps to a django user
+class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE,null=False,blank=False)
+
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
+    
+    class Meta:
+        permissions = (
+            ('manage_student','Manage student'),
+        )
+        ordering = ['first_name','last_name']
+
+    def save(self,*args,**kwargs):
+        #only run if the student is being created, not updated
+        if(not self.pk):
+            #give the admin group amd the student's user permission to manage the student
+            adminGroup = Group.objects.get(name='admin')
+            super().save(*args,**kwargs)
+            assign_perm('manage_student',adminGroup,self)
+            assign_perm('manage_student',self.user,self)
+        else:
+            super().save(*args,**kwargs)
+        
+    
+    def delete(self,*args,**kwargs):
+        adminGroup = Group.objects.get(name='admin')
+        remove_perm('manage_student',adminGroup,self)
+        remove_perm('manage_student',self.user,self)
+
+        #self.user.delete()
+        super().delete()
+
+    #gets all the departments this student is a member of
+    def getMembership(self):
+        #get all depts
+        departmentQuerySet = Department.objects.all()
+        for department in departmentQuerySet:
+            #remove depts that the student is not a member of
+            if(self.user not in department.memberGroup.user_set.all() and self.user not in department.leaderGroup.user_set.all()):
+                departmentQuerySet = departmentQuerySet.exclude(id=department.id)
+        return departmentQuerySet
+    
+    #update this student's department membership given a set of departments they should be a member of
+    def updateMembership(self,departmentMembership):
+        #go through all depts
+        for department in Department.objects.all():
+            #make sure student is member if not already
+            if(department in departmentMembership and self.user not in department.memberGroup.user_set.all()):
+                self.user.groups.add(department.memberGroup)
+            #remove mebership if they are not supposed to be a member anymore
+            elif(department not in departmentMembership and self.user in department.memberGroup.user_set.all()):
+                self.user.groups.remove(department.memberGroup)

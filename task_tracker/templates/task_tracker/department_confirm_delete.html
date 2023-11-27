@@ -1,0 +1,14 @@
+{% extends 'task_tracker/base_template.html' %}
+
+{% block content %}
+<div class="pt-3 px-3">
+<h5 class="pb-3"> Are you sure you want to delete "{{ department.name }}"?</h5>
+
+<!-- form code -->
+<button class="btn btn-primary float-start" onclick="window.location.href='{% url 'department-detail-view' department.id%}'">Cancel</button>
+<form action = "" method="POST">
+        {% csrf_token %}
+        <input class="btn btn-danger float-start" type="submit" name="Delete">
+    </form>
+</div>
+{% endblock %}

@@ -26,27 +26,30 @@ SECRET_KEY = 'django-insecure-cx1rh!i7kwr6s99zv189o*uhsjqnaqb55a$f#ec%x16)&h_dap
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['128.198.219.237','127.0.0.1','192.168.0.15']
+ALLOWED_HOSTS = ['128.198.209.193','127.0.0.1','192.168.0.15']
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'task_tracker',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'task_tracker',
     'bootstrap5',
     'crispy_forms',
     "crispy_bootstrap5",
+    'guardian',
 ]
 
 # Add support for authenticating users
 AUTHENTICATION_BACKENDS = [
 'django.contrib.auth.backends.ModelBackend',
+'guardian.backends.ObjectPermissionBackend',
 ]
 
 

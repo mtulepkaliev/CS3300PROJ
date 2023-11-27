@@ -6,20 +6,22 @@
         <div class="mt-2 me-5">
           <h2 class="float-start">{{ task.summary }}</h2>
 
-          <!-- delete and edit buttons-->
-          <a href="{% url 'task-delete-view' task.id %}" class="btn btn-danger float-end ms-3">Delete Task</a>
-          <a href="{% url 'task-update-view' task.id %}" class="btn btn-primary float-end ms-3">Edit Task</a>
+          {% if can_edit %}
+            <!-- delete and edit buttons -->
+            <a href="{% url 'task-delete-view' task.id %}" class="btn btn-danger float-end ms-3">Delete Task</a>
+            <a href="{% url 'task-update-view' task.id %}" class="btn btn-primary float-end ms-3">Edit Task</a>
 
-          <!-- mark comp;ete/incomplete buttons-->
-          {% if task.is_complete %}
-            <a href="{% url 'task-toggle-complete-view' task.id %}" class="btn btn-warning float-end">Mark Incomplete</a>
-          {% else %}
-            <a href="{% url 'task-toggle-complete-view' task.id %}" class="btn btn-success float-end">Mark Complete</a>
+            <!-- mark comp;ete/incomplete buttons -->
+            {% if task.is_complete %}
+              <a href="{% url 'task-toggle-complete-view' task.id %}" class="btn btn-warning float-end">Mark Incomplete</a>
+            {% else %}
+              <a href="{% url 'task-toggle-complete-view' task.id %}" class="btn btn-success float-end">Mark Complete</a>
+            {% endif %}
           {% endif %}
         </div>
       </li>
 
-      <!-- created and due dates-->
+      <!-- created and due dates -->
       <li class="list-group-item border-0">
         <h4>Created: {{ task.date_created|date:'M. j,Y' }}</h4>
       </li>
@@ -28,9 +30,13 @@
       </li>
 
       <li class="list-group-item border-0">
-        <h4>Department: {{ task.get_department_display }}</h4>
+        <h4>
+          Department(s):{% for department in task.departments.all %}
+            {{ department }},
+          {% endfor %}
+        </h4>
       </li>
-      <!-- completion status-->
+      <!-- completion status -->
       <li class="list-group-item border-0">
         {% if task.is_complete %}
           <h4>Status: <span class="text-success">Complete</span></h4>
@@ -39,8 +45,7 @@
         {% endif %}
       </li>
 
-
-      <!-- Colored priority text-->
+      <!-- Colored priority text -->
       <li class="list-group-item border-0">
         {% if task.priority == 1 %}
           <h4>Priority: <span class="text-danger">High</span></h4>
@@ -51,9 +56,9 @@
         {% endif %}
       </li>
       <li class="list-group-item border-0">
-        <!-- Parent task-->
-        {% if task.parent_task%}
-          <h4>Parent Task: <a href="{%url 'task-detail-view' task.parent_task.id %}">{{task.parent_task}}</a></h4>
+        <!-- Parent task -->
+        {% if task.parent_task %}
+          <h4>Parent Task: <a href="{% url 'task-detail-view' task.parent_task.id %}">{{ task.parent_task }}</a></h4>
         {% endif %}
       </li>
       <li class="mt-4 list-group-item border-2 border-black">

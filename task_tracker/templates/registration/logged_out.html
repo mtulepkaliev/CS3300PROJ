@@ -1,0 +1,9 @@
+<!-- inherit from base.html -->
+{% extends 'task_tracker/base_template.html' %}
+
+{% block content %} 
+<div class='mx-5 col-6 mt-4 '>
+  <h4>Logged out!</h4>
+  <a class="btn btn-primary" href="{% url 'login'%}">Click here to login again.</a>
+</div>
+{% endblock %}

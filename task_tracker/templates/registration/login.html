@@ -1,0 +1,35 @@
+<!-- inherit from base.html -->
+{% extends 'task_tracker/base_template.html' %}
+
+{% block content %}
+
+<div class='mx-5 col-6 mt-4 '>
+  <!-- doesn't work correctly - do not want to do all messages-->
+
+  {% if form.errors %}
+    <p>Your username and password didn't match. Please try again.</p>
+  {% endif %}
+
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p>Your account doesn't have access to this page. To proceed,
+      please login with an account that has access.</p>
+    {% else %}
+      <p>Please login to see this page.</p>
+    {% endif %}
+  {% endif %}
+
+  {% load crispy_forms_tags %}
+
+  <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    {{form|crispy}}
+    <input class="btn btn-primary mb-3" type="submit" value="Login">
+    <input type="hidden" name="next" value="{{ next }}">
+  </form>
+
+  {# Assumes you setup the password_reset view in your URLconf #}
+  <p><a class="btn btn-primary " href="{% url 'password_reset' %}">Lost password?</a></p>
+  <p><a class="btn btn-primary " href="{% url 'student-register-page' %}">Register</a></p>
+</div>
+{% endblock %}
